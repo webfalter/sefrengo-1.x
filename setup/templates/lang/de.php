@@ -125,7 +125,7 @@ $cms_lang['info']					= 'Info';
 
 $cms_lang['pretest_version']		= 'Ihre PHP Version: ';
 $cms_lang['pretest_recommended']	= 'Empfohlen ';
-$cms_lang['pretest_MySQL']			= 'Eine Mysql Version gr&#246;&szlig;er oder gleich 3.23.58 ist erforderlich und der Mysql-Support f&#252;r PHP muss installiert sein, damit Sie mit Sefrengo arbeiten k&#246;nnen.';
+$cms_lang['pretest_MySQL']			= 'Eine Mysql Version gr&#246;&szlig;er oder gleich 4.1.3 ist erforderlich und der Mysql-Support f&#252;r PHP muss installiert sein, damit Sie mit Sefrengo arbeiten k&#246;nnen.';
 $cms_lang['pretest_zlib']			= 'Empfohlen, damit Sefrengo komprimierte tar Archive verarbeiten kann. Sefrengo Plugins liegen in der Regel als komprimierte (*.cmsplugin) tar Archive vor.';
 $cms_lang['pretest_gdlib']			= 'Empfohlen zum Erstellen der Thumbnails ';
 $cms_lang['pretest_zip']			= 'Ist diese Bibliothek installiert, k&#246;nnen im Sefrengo Dateimanager zip- Dateien hochgeladen und auf dem Server entpackt werden.';

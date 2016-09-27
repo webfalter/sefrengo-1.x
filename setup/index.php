@@ -317,10 +317,10 @@ class setup {
 		$tpl -> insert('', 'next_step', 'screen_chose_setup_kind');
         
         // PHP Version		
-		$tpl -> insert('test_PHP_check', 'name_PHP_check' , 'PHP version >= 4.3.2' );
-		$tpl -> insert('test_PHP_check', 'value_PHP_check', $this -> test_config( version_compare(phpversion(), '4.3.2') <= 0?0:1  ));
-		$tpl -> insert('test_PHP_check', 'class_PHP_check', $this -> test_config_text(version_compare(phpversion(), '4.3.2') <= 0?0:1 ));
-		$tpl -> insert('test_PHP_check', 'style_PHP_config', $this -> test_config_style(version_compare(phpversion(), '4.3.2') <= 0?0:1 ));
+		$tpl -> insert('test_PHP_check', 'name_PHP_check' , 'PHP version >= 5.5.0' );
+		$tpl -> insert('test_PHP_check', 'value_PHP_check', $this -> test_config( version_compare(phpversion(), '5.5.0') <= 0?0:1  ));
+		$tpl -> insert('test_PHP_check', 'class_PHP_check', $this -> test_config_text(version_compare(phpversion(), '5.5.0') <= 0?0:1 ));
+		$tpl -> insert('test_PHP_check', 'style_PHP_config', $this -> test_config_style(version_compare(phpversion(), '5.5.0') <= 0?0:1 ));
 		$tpl -> insert('test_PHP_check', 'desc_PHP_check' , $this -> cms_lang['pretest_version'].phpversion() );
 		$tpl -> insert('test_PHP_check', 'id_PHP_check' , 'version' );
 		$tpl -> insert('test_PHP_check', 'info' , $this -> cms_lang['info'] );
