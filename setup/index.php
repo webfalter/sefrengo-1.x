@@ -206,7 +206,7 @@ class setup {
 				break;
 			case 'screen_check_version':
 				$return_this = $this -> manage_insert_sql_dump();
-				$return_this = $this -> screen_check_version();
+				$return_this .= $this -> screen_check_version();
 				break;
 			case 'screen_utf8_convert':
 				$return_this = $this -> screen_utf8_convert();
@@ -259,7 +259,7 @@ class setup {
 
 
     function test_config($boolean) {
-  
+  		$tpl = '';
         if ($boolean) {
             $tpl .= '<p>';
             $tpl .= 'Info &raquo;';
@@ -275,7 +275,7 @@ class setup {
     }
 
     function test_config_text($boolean) {
-  
+  		$tpl = '';
         if ($boolean) {
             $tpl .= '';
         } else {
@@ -285,7 +285,7 @@ class setup {
     }
 
     function test_config_style($boolean) {
-  
+  		$tpl = '';
         if ($boolean) {
             $tpl .= 'display:none';
         } else {
@@ -327,9 +327,9 @@ class setup {
 
         // MySQL support		
 		$tpl -> insert('test_PHP_check', 'name_PHP_check' , 'MySQL support' );
-		$tpl -> insert('test_PHP_check', 'value_PHP_check', $this -> test_config(@function_exists( 'mysql_connect' )));
-		$tpl -> insert('test_PHP_check', 'class_PHP_check', $this -> test_config_text(@function_exists( 'mysql_connect' )));
-		$tpl -> insert('test_PHP_check', 'style_PHP_config', $this -> test_config_style(@function_exists( 'mysql_connect' )));
+		$tpl -> insert('test_PHP_check', 'value_PHP_check', $this -> test_config(extension_loaded( 'mysqli' )));
+		$tpl -> insert('test_PHP_check', 'class_PHP_check', $this -> test_config_text(extension_loaded( 'mysqli' )));
+		$tpl -> insert('test_PHP_check', 'style_PHP_config', $this -> test_config_style(extension_loaded( 'mysqli' )));
 		$tpl -> insert('test_PHP_check', 'desc_PHP_check' , $this -> cms_lang['pretest_MySQL'] );
 		$tpl -> insert('test_PHP_check', 'id_PHP_check' , 'mysql' );
 		$tpl -> insert('test_PHP_check', 'info' , $this -> cms_lang['info'] );
@@ -690,16 +690,17 @@ class setup {
 		}
 
 		//check host, username and password
-		$con_handle = @mysql_connect ($this -> globals['host'], $this -> globals['user'], $this -> globals['pass']);
-		if (empty($con_handle)) {
+		$con_handle = new mysqli($this -> globals['host'], $this -> globals['user'], $this -> globals['pass']);
+		if ($con_handle -> connect_errno) {
 			$tpl -> insert('', 'connection_error', $this -> cms_lang['connection_error2']);
 		    $tpl -> insert('', 'connection_class', 'warning');
 			$error = true;
-		} elseif (!mysql_select_db ($this -> globals['db'], $con_handle)) {
-			$tpl -> insert('', 'connection_error', $this -> cms_lang['connection_error3']. $this -> globals[db] . $this -> cms_lang['connection_error4']);
+		} elseif (!$con_handle -> select_db($this -> globals['db'])) {
+			$tpl -> insert('', 'connection_error', $this -> cms_lang['connection_error3']. $this -> globals['db'] . $this -> cms_lang['connection_error4']);
 		    $tpl -> insert('', 'connection_class', 'warning');
 			$error = true;
 		}
+		$con_handle->close();
 
 		$tpl -> insert('', 'root_path', $this -> globals['root_path']);
 		$tpl -> insert('', 'root_http_path', $this -> globals['root_http_path']);
@@ -962,7 +963,7 @@ class setup {
 		//insert data
 		$tpl = new gb_template();
 		$tpl -> insert('', 'host', $this -> globals['host']);
-		$tpl -> insert('', 'db', $this -> globals[db]);
+		$tpl -> insert('', 'db', $this -> globals['db']);
 		$tpl -> insert('', 'prefix', $this -> globals['prefix']);
 		$tpl -> insert('', 'user', $this -> globals['user']);
 		$tpl -> insert('', 'pass', $this -> globals['pass']);
@@ -974,7 +975,7 @@ class setup {
 		//$tpl -> insert('', 'client_http_path', $client_http_path);
 		$tpl -> insert('', 'sql_target', $this -> globals['sql_target']);
 		$tpl -> insert('', 'lang', $this -> globals['lang']);
-		$tpl -> insert('', 'email', $this -> globals[email]);
+		$tpl -> insert('', 'email', $this -> globals['email']);
 		return $tpl -> make('templates/config.php.tpl',$this -> template_lang);
 	}
 
@@ -997,7 +998,7 @@ class setup {
 		//insert data
 		$tpl = new gb_template();
 		$tpl -> insert('', 'host', $this -> globals['host']);
-		$tpl -> insert('', 'db', $this -> globals[db]);
+		$tpl -> insert('', 'db', $this -> globals['db']);
 		$tpl -> insert('', 'prefix', $this -> globals['prefix']);
 		$tpl -> insert('', 'user', $this -> globals['user']);
 		$tpl -> insert('', 'pass', $this -> globals['pass']);
@@ -1044,8 +1045,8 @@ class setup {
 		$sql_data = $this -> remove_remarks($sql_data);
 		$sql_pieces = $this -> split_sql_file($sql_data, ';');
 		$sql_count = count($sql_pieces);
-		$con_handle =  mysql_connect ($this -> globals['host'], $this -> globals['user'], $this -> globals['pass']);
-		mysql_select_db ($this -> globals[db], $con_handle);
+		$con_handle =  new mysqli($this -> globals['host'], $this -> globals['user'], $this -> globals['pass']);
+		$con_handle -> select_db($this -> globals['db']);
 
 		//DEBUGGING
 		if ($this -> debug) echo "Auszuf&#252;hrende Config Values querys:  $sql_count <br><br>";
@@ -1054,15 +1055,16 @@ class setup {
 		{
 			$sql = trim($sql_pieces[$i]);
 			if (!empty($sql)) {
-				mysql_query ($sql, $con_handle);
+				$con_handle -> query($sql);
 
 				//DEBUGGING
 				if($this -> debug) {
-					if(mysql_error() != '')	echo  $i+1 . ":  <font color='darkred'><b>FEHLER</b></font>  -->  " . mysql_error() . "<br>" . $sql . '<br><br>';
+					if($con_handle -> error != '')	echo  $i+1 . ":  <font color='darkred'><b>FEHLER</b></font>  -->  " . $con_handle->error . "<br>" . $sql . '<br><br>';
 					else echo  $i+1 . ":   <font color= 'darkgreen'><b>AUSGEF&#220;HRT</b></font><br>". $sql . '<br><br>';
 				}
 			}
 		}
+		$con_handle -> close();
 	}
 	
 	function manage_insert_sql_dump(){
@@ -1113,16 +1115,16 @@ class setup {
 				
 				//client sql update
 				if( is_file('sql/' .$basefile . '_client.sql') ) {
-					$result = mysql_query("SELECT idclient FROM ".$this -> globals['prefix'] .'clients', $this->mysql_con_handle);
+					$result = $this->mysql_con_handle->query("SELECT idclient FROM ".$this -> globals['prefix'] .'clients');
 					if (!$result) {
 						die("Failed in get_table_content  - SELECT idclient FROM FROM ".$this->globals['prefix']."clients");
 					}
 				
 					$idclients = array();
-					while ($row = mysql_fetch_array($result)) {
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 						$idclients[ $row['idclient'] ] = $row['idclient'];
 					}
-					mysql_free_result($result);
+					$result->free();
 					
 					$this->globals['sql_target'] = $basefile . '_client.sql';
 					
@@ -1134,16 +1136,16 @@ class setup {
 				
 				//lang sql update
 				if( is_file('sql/' .$basefile . '_lang.sql') ) {
-					$result = mysql_query("SELECT idclient, idlang FROM ".$this -> globals['prefix']."clients_lang", $this->mysql_con_handle);
+					$result = $this->mysql_con_handle->query("SELECT idclient, idlang FROM ".$this -> globals['prefix']."clients_lang");
 					if (!$result) {
 						die("Failed in get_table_content  - SELECT * FROM ".$this->globals['prefix']."clients_lang");
 					}
 				
 					$replacements = array();
-					while ($row = mysql_fetch_array($result)) {
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 						$replacements[ $row['idlang'] ] = array('idclient'=>$row['idclient'], 'idlang'=>$row['idlang']);
 					}
-					mysql_free_result($result);
+					$result->free();
 					
 					$this->globals['sql_target'] = $basefile . '_lang.sql';
 					
@@ -1164,7 +1166,7 @@ class setup {
 				$return_this .= $this -> insert_config_values();//output only for debugging
 			}
 		}
-		
+
 		return $return_this;
 	}
 	
@@ -1180,14 +1182,14 @@ class setup {
 	
 	function _mysql_connect() {
 		if ( is_resource($this->mysql_con_handle) ) return;
-        $con_handle =  mysql_connect ($this -> globals['host'],
+        $con_handle =  new mysqli ($this -> globals['host'],
 		$this -> globals['user'],
 		$this -> globals['pass']);
-		mysql_select_db ($this -> globals['db'], $con_handle);
+		$con_handle -> select_db($this -> globals['db']);
 		$this->mysql_con_handle = $con_handle;
-		if ( !is_resource($this->mysql_con_handle) ) {
+		/*if ( !is_resource($this->mysql_con_handle) ) {
 			die('no sql connect handle defined');
-		}
+		}*/
 	}
 
 	/**
@@ -1258,11 +1260,11 @@ class setup {
 		for ($i = 0; $i < $sql_count; $i++) {
 			$sql = trim($sql_pieces[$i]);
 			if (!empty($sql)) {
-				mysql_query ($sql, $this->mysql_con_handle);
+				$this->mysql_con_handle->query($sql);
 
 				//DEBUGGING
 				if($this -> debug) {
-					if(mysql_error() != '') echo  $i+1 . ":  <font color='darkred'><b>FEHLER</b></font>  -->  " . mysql_error() . "<br>" . $sql . '<br><br>';
+					if($this->mysql_con_handle->error != '') echo  $i+1 . ":  <font color='darkred'><b>FEHLER</b></font>  -->  " . $this->mysql_con_handle->error . "<br>" . $sql . '<br><br>';
 					else echo  $i+1 . ":   <font color= 'darkgreen'><b>AUSGEF&#220;HRT</b></font><br>";//. $sql . '<br><br>';
 				}
 			}
@@ -1273,23 +1275,23 @@ class setup {
 		
 		if( empty($this -> globals['host'])) die('Fatal error - No DB connection data');
 		
-		$con_handle =  mysql_connect ($this -> globals['host'],
+		$con_handle =  new mysqli($this -> globals['host'],
 		$this -> globals['user'],
 		$this -> globals['pass']);
-		mysql_select_db ($this -> globals[db], $con_handle);
+		$con_handle->select_db($this -> globals['db']);
 		
 		$sql = 'SHOW TABLES';
-		$result = mysql_query ($sql, $con_handle);
+		$result = $con_handle->query($sql);
 		
         $version_exists = false;
-        while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+        while ($line = $result->fetch_array(MYSQLI_ASSOC)) {
            foreach ($line as $col_value) {
                if($col_value == $this -> globals['prefix'] . 'values'){
                		$version_exists = true;
                }
            }
         }
-        mysql_free_result($result);
+		$result->free();
         
         //abort - no update table found
         if(! $version_exists)
@@ -1298,8 +1300,8 @@ class setup {
         //echo $this -> globals['prefix']."values<br>";
         if($version_exists){
         	$sql = "SELECT value FROM `".$this -> globals['prefix']."values`  WHERE group_name =  'cfg' AND key1 =  'version'";
-			$result = mysql_query ($sql, $con_handle);
-			if ($line = mysql_fetch_array($result, MYSQL_ASSOC)){
+			$result = $con_handle->query($sql);
+			if ($line = $result->fetch_array(MYSQLI_ASSOC)) {
 				$pieces = explode('.', $line['value']);
 				$version['prior'] = $pieces['0'];
 				$version['minor'] = $pieces['1'];
@@ -1310,7 +1312,7 @@ class setup {
 			}
         }
         
-        mysql_close($con_handle);
+        $con_handle->close();
 
 		$version['prior'] = '00';
 		$version['minor'] = '00';
