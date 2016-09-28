@@ -154,9 +154,9 @@ class Session {
                 } 
                 // Remove session ID info from QUERY String - it is in cookie
                 if ( isset( $_SERVER['QUERY_STRING'] ) && ( '' != $_SERVER['QUERY_STRING'] ) ) {
-                    $_SERVER['QUERY_STRING'] = ereg_replace(
+                    $_SERVER['QUERY_STRING'] = preg_replace(
                         //"(^|&)" . quotemeta( urlencode( $this->name ) ) . '=' . $id . "(&|$)",
-                        "(^|&)" . quotemeta( urlencode( $this->name ) ) . "=(.)*(&|$)",
+                        "/(^|&)" . quotemeta( urlencode( $this->name ) ) . "=(.)*(&|$)/",
                         "\\1", $_SERVER['QUERY_STRING'] );
                 }
                 break;
@@ -173,9 +173,9 @@ class Session {
                 } 
 
                 if ( isset( $_SERVER['QUERY_STRING'] ) && ( "" != $_SERVER['QUERY_STRING'] ) ) {
-                    $_SERVER['QUERY_STRING'] = ereg_replace( 
+                    $_SERVER['QUERY_STRING'] = preg_replace(
                         // "(^|&)".quotemeta(urlencode($this->name)).'='.$id."(&|$)",
-                        "(^|&)" . quotemeta( urlencode( $this->name ) ) . "=(.)*(&|$)",
+                        "/(^|&)" . quotemeta( urlencode( $this->name ) ) . "=(.)*(&|$)/",
                         "\\1", $_SERVER['QUERY_STRING'] );
                 }
                 break;
@@ -218,12 +218,12 @@ class Session {
         
         if ( !$this->session_enabled ) return $url;
         
-        $url = ereg_replace( 
+        $url = preg_replace(
             // "([&?])".quotemeta(urlencode($this->name)).'='.$this->id."(&|$)",
-            "(&amp;|\?)" . quotemeta( urlencode( $this->name ) ) . "=(.)*(&amp;|$)",
+            "/(&amp;|\?)" . quotemeta( urlencode( $this->name ) ) . "=(.)*(&amp;|$)/",
             "\\1", $url ); 
         // Remove trailing ?/& if needed
-        $url = ereg_replace( "(&amp;|\?)+$", '', $url );
+        $url = preg_replace( "/(&amp;|\?)+$/", '', $url );
 
         // Generate Tokenize Session
         if( $this->use_token_sid ) {
@@ -322,7 +322,7 @@ class Session {
                 $str .= "\$$var = array(); ";
                 while ( "array" == $l ) {
                     // Structural recursion
-                    $this->serialize( $var . "['" . ereg_replace( "([\\'])", "\\\\1", $k ) . "']", $str );
+                    $this->serialize( $var . "['" . preg_replace( "/([\\'])/", "\\\\1", $k ) . "']", $str );
                     eval( "\$l = gettype(list(\$k)=each(\$$var));" );
                 } 
 
@@ -341,7 +341,7 @@ class Session {
             default: 
                 // $$var is an atom. Extract it to $l, then generate code.
                 eval( "\$l = \$$var;" );
-                $str .= "\$$var = '" . ereg_replace( "([\\'])", "\\\\1", $l ) . "'; ";
+                $str .= "\$$var = '" . preg_replace( "/([\\'])/", "\\\\1", $l ) . "'; ";
                 break;
         } 
     } 
@@ -468,7 +468,7 @@ class Session {
             } 
         } 
     } 
-    // püfen ob Suchmaschine
+    // pï¿½fen ob Suchmaschine
 //    function check_searchengines() {
 //        // echo 'searchchecktesttest';
 //        global $cfg_cms, $REMOTE_ADDR;

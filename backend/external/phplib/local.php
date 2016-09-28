@@ -87,13 +87,13 @@ class DB_cms extends DB_Sql {
         if ( $this->cache_mode == 'DB_READ_CACHE' ) {
             $this->Record = $this->cache[$this->Row];
         } elseif ( $this->fetch_mode == 'DB_FETCH_ARRAY' ) {
-            $this->Record = @mysql_fetch_array( $this->Query_ID );
+            $this->Record = $this->Query_ID->fetch_array(MYSQLI_NUM);
         } elseif ( $this->fetch_mode == 'DB_FETCH_ASSOC' ) {
-            $this->Record = @mysql_fetch_assoc( $this->Query_ID );
+            $this->Record = $this->Query_ID->fetch_array(MYSQLI_ASSOC);
         } 
         $this->Row += 1;
-        $this->Errno = mysql_errno();
-        $this->Error = mysql_error();
+        $this->Errno = $this->Link_ID->errno;
+        $this->Error = $this->Link_ID->error;
         $stat = is_array( $this->Record );
         if ( !$stat && $this->Auto_Free && !$this->EOF ) {
             $this->free();
@@ -284,8 +284,7 @@ class DB_cms extends DB_Sql {
     } 
     // free result
     function free() {
-        @mysql_free_result( $this->Query_ID );
-        $this->Query_ID = 0;
+        $this->Query_ID->free();
         $this->delete_cache();
         $this->write_cache();
     } 
@@ -310,7 +309,7 @@ class DB_cms extends DB_Sql {
     // return the last insert id
     function insert_id() {
         // if (mysql_affected_rows($this->Link_ID)>0) return mysql_insert_id($this->Link_ID);
-        return mysql_insert_id( $this->Link_ID );
+        return $this->Link_ID->insert_id;
     } 
     // fetch a query in a array
     function fetch_query( $Sql, $Mode = 'DB_FETCH_ASSOC' ) {
@@ -338,11 +337,7 @@ class DB_cms extends DB_Sql {
         if ( !$this->connect() ) {
             return 0;
             // we already complained in connect() about that.
-        } 
-        // new query, discard previous result.
-        if ( $this->Query_ID ) {
-            $this->free();
-        } 
+        }
         if( $Cache_it >= 1 && $this->use_cache ) {
             $cache = md5( trim( $Query_String ) );
             if ( $this->read_cache( $cache ) ) {
@@ -357,10 +352,10 @@ class DB_cms extends DB_Sql {
         if ( $this->Debug ) {
             $deb->collect( 'MySql: ' . $Query_String, 'sql' );
         } 
-        $this->Query_ID = @mysql_query( $Query_String, $this->Link_ID );
+        $this->Query_ID = $this->Link_ID->query($Query_String);
         $this->Row = 0;
-        $this->Errno = mysql_errno();
-        $this->Error = mysql_error();
+        $this->Errno = $this->Link_ID->errno;
+        $this->Error = $this->Link_ID->error;
         if ( !$this->Query_ID ) {
             $this->halt( "Invalid SQL: " . $Query_String );
         } elseif( $Cache_it >= 1 && $this->use_cache ) {
@@ -452,7 +447,7 @@ class cms_CT_Sql extends CT_Sql {
         $sess->gc( true );
 	    if( $id >= 1 && $this->session_enabled ) {
             $this->db->query(sprintf("delete from %s where name = '%s' and sid != '%s' and user_id = '%s'",
-                $cms_db[sessions],
+                $cms_db['sessions'],
                 addslashes($name),
                 addslashes($str),
                 addslashes($id)));
@@ -495,7 +490,7 @@ class cms_Backend_Session extends Session {
     var $lifetime = '0'; // 0 = do session cookies, else minutes
     var $refresh = '0'; // 0 = no refresh, else minutes
     var $that_class = 'cms_CT_Sql'; // name of data storage container
-    var $gc_probability = '5'; // Wahrscheinlichkeit der Sessionlöschung
+    var $gc_probability = '5'; // Wahrscheinlichkeit der Sessionlï¿½schung
     var $session_enabled = true; // Session an, bzw. ausschalten
     var $block_alien_side = true;
     var $use_token_sid;
@@ -518,7 +513,7 @@ class cms_Frontend_Session extends Session {
     var $lifetime = '0'; // 0 = do session cookies, else minutes
     var $refresh = '0'; // 0 = no refresh, else minutes
     var $that_class = 'cms_CT_Sql'; // name of data storage container
-    var $gc_probability = '5'; // Wahrscheinlichkeit der Sessionlöschung
+    var $gc_probability = '5'; // Wahrscheinlichkeit der Sessionlï¿½schung
     var $session_enabled = true; // Session an, bzw. ausschalten
     var $block_alien_side = true;
     var $use_token_sid;

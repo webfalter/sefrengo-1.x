@@ -76,7 +76,7 @@ class UTF8Converter{
 				if ($this->tables_was_chosen() ) {
 					$this->paintTableConvertInfo();
 				} else {
-					$this->paintTableSelectForm('Es wurden keine Tabellen ausgewählt');
+					$this->paintTableSelectForm('Es wurden keine Tabellen ausgewï¿½hlt');
 				}
 				break;
 			case 'start_from_external_config':
@@ -155,7 +155,7 @@ class UTF8Converter{
 		$select_mode .= '</select>' ."\n";
 
 		$out .= '<form action ="utf8_converter.php" name="data" method="post">
-		Bitte wählesn Sie die zu konvertierenden Tabellen:<br />
+		Bitte wï¿½hlesn Sie die zu konvertierenden Tabellen:<br />
 		'.$select.'<br />'.$select_mode.'
 		<input type ="hidden" name = "action" value="create_table_definitions">
 		<input type ="hidden" name = "data" value="'.$this->exportDataString().'">
@@ -174,7 +174,7 @@ class UTF8Converter{
 		}
 		$this->execDump($sql);
 		
-		$out = 'Temporäre Tabellen werden angelegt.'
+		$out = 'Temporï¿½re Tabellen werden angelegt.'
 			.'<meta http-equiv="refresh" content="0; URL=utf8_converter.php?action=convert_table_data&amp;data='.$this->exportDataString().'">';
 			//.'<br /><br /><a href="utf8_converter.php?action=convert_table_data&amp;data='.$this->exportDataString().'">Link</a>';
 		
@@ -360,7 +360,7 @@ class UTF8Converter{
 		//
 		// Drop the last ',$crlf' off ;)
 		//
-		$schema_create = ereg_replace(',' . $crlf . '$', "", $schema_create);
+		$schema_create = preg_replace('/,' . $crlf . '$/', "", $schema_create);
 	
 		//
 		// Get any Indexed fields from the database...
@@ -478,7 +478,7 @@ class UTF8Converter{
 			//
 			// Get rid of the last comma
 			//
-			$table_list = ereg_replace(', $', '', $table_list);
+			$table_list = preg_replace('/, $/', '', $table_list);
 			$table_list .= ')';
 			//
 			// Start building the SQL statement.
@@ -511,7 +511,7 @@ class UTF8Converter{
 			//
 			// Get rid of the the last comma.
 			//
-			$schema_insert = ereg_replace(',$', '', $schema_insert);
+			$schema_insert = preg_replace('/,$/', '', $schema_insert);
 			$schema_insert .= ');'."\n";
 	
 			$final .= $schema_insert;
