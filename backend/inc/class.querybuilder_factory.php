@@ -52,7 +52,7 @@ class querybuilder_factory
 		if (!isset($this->_db["'$dbtype'"])) {
 			// no ... create new query builder for the db-type
 			if (!file_exists($inc_path.'class.querybuilder_'.$dbtype.'.php')) {
-				die('Querybuilder für Datenbank <b>'.$db_interface->Database.'</b> vom Typ <b>'. $dbtype .'</b> nicht gefunden.');
+				die('Querybuilder fï¿½r Datenbank <b>'.$db_interface->Database.'</b> vom Typ <b>'. $dbtype .'</b> nicht gefunden.');
 			} else {
 				include_once($inc_path.'class.querybuilder_'.$dbtype.'.php');
 				eval('$this->_db["'.$dbtype.'"] = new querybuilder_'.$dbtype.'();');
@@ -77,10 +77,10 @@ class querybuilder_factory
 		// check if a querybuilder for the desired db exits
 		if (!isset($this->_db["'ado_$db_type'"])) {
 			// no ... create new adodb-object
-			if (!file_exists($inc_path.'adodb/adodb.inc.php')) {
-				die("phpADODB für Datenbank vom Typ <b>$db_type</b> nicht gefunden.");
+			if (!file_exists($inc_path.'adodb5/adodb.inc.php')) {
+				die("phpADODB fï¿½r Datenbank vom Typ <b>$db_type</b> nicht gefunden.");
 			} else {
-        include_once($inc_path."adodb/adodb.inc.php");
+        include_once($inc_path."adodb5/adodb.inc.php");
         $db = NewADOConnection('mysql');
 				$this->_db["'ado_$db_type'"] = NewADOConnection($db_type);
         $db->Connect($cfg_cms['db_host'], $cfg_cms['db_user'], $cfg_cms['db_password'], $cfg_cms['db_database']);
@@ -98,8 +98,8 @@ class querybuilder_factory
 **
 ** Description : abstract sql-query-builder
 **
-** Copyright   : Jürgen Brändle, 2002-2003
-** Author      : Jürgen Brändle, braendle@web.de
+** Copyright   : Jï¿½rgen Brï¿½ndle, 2002-2003
+** Author      : Jï¿½rgen Brï¿½ndle, braendle@web.de
 ** Urls        : www.Sefrengo.de
 ** Create date : 2003-02-09
 ** Last update : 2003-02-26

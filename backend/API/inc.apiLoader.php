@@ -41,11 +41,11 @@ $ini_separator = strtoupper(substr(PHP_OS, 0, 3) == 'WIN') ? ';' : ':';
 //$ini_original = ( strlen($ini_original) > 0 ) ? $ini_original. $ini_separator: '';
 ini_set('include_path', '.' 
 			. $ini_separator . $_api_path
-			. $ini_separator . preg_replace('!/API/$!', '/external/adodb/', $_api_path)
+			. $ini_separator . preg_replace('!/API/$!', '/external/adodb5/', $_api_path)
 			. $ini_separator . preg_replace('!/API/$!', '/external/pear.php.net/', $_api_path)			
 			);
 
-//echo $ini_original . $cfg_cms['cms_path'].  'external/adodb/';
+//echo $ini_original . $cfg_cms['cms_path'].  'external/adodb5/';
 
 
 
