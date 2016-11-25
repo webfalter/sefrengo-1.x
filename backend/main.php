@@ -114,6 +114,7 @@ include_once ($this_dir.'inc/class.repository.php');
 // Klassen initialisieren
 $deb = new cms_debug;
 $db = new DB_cms;
+$db->set_fetch_mode('DB_FETCH_ASSOC');
 $db_query = new querybuilder_factory();
 $db_query = $db_query -> get_db($db, 'cms_db', $this_dir.'inc/');
 $val_ct = new values_ct();
@@ -134,6 +135,7 @@ if ( $cfg_cms['db_optimice_tables']['enable'] && (time() > ($cfg_cms['db_optimic
 // Template initialisieren
 $tpl = new HTML_Template_IT($this_dir.'tpl/'.$cfg_cms['skin'].'/');
 
+$db->set_fetch_mode('DB_FETCH_ARRAY');
 // Session starten
 page_open(array('sess' => 'cms_Backend_Session',
                 'auth' => 'cms_Backend_Auth'));
